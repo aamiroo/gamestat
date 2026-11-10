@@ -2,7 +2,7 @@ from pathlib import Path
 import psutil
 
 
-def get_cpu_temp():
+def cpu_temp():
     hwmon_path = Path("/sys/class/hwmon")
 
     for hwmon in hwmon_path.glob("hwmon*"):
@@ -29,7 +29,7 @@ def cpu_usage ():
     return psutil.cpu_percent(interval=1)
 
 if __name__ == "__main__":
-    print(f"CPU Temp: {get_cpu_temp()} °C")
+    print(f"CPU Temp: {cpu_temp()} °C")
     print(f"CPU Usage: {cpu_usage()} %")
 
     

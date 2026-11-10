@@ -22,8 +22,14 @@ def get_cpu_temp():
                 temp = int (input_file.read_text().strip())
         
                 return temp / 1000
-        return None
+    return None
+
+
+def cpu_usage ():
+    return psutil.cpu_percent(interval=1)
 
 if __name__ == "__main__":
-    print(get_cpu_temp())
+    print(f"CPU Temp: {get_cpu_temp()} °C")
+    print(f"CPU Usage: {cpu_usage()} %")
+
     

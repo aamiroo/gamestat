@@ -2,6 +2,7 @@ import cpu
 import ram
 import gpu
 import json
+import time
 
 
 def sys_info():
@@ -29,6 +30,9 @@ def sys_info():
         gpu.pynvml.nvmlShutdown()
 
 if __name__ == "__main__":
-    info = sys_info()
+    while True:
 
-    print(json.dumps(info, indent=4))
+        info = sys_info()
+
+        print(json.dumps(info, indent=4))
+        time.sleep(1)

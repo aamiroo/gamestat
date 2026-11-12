@@ -6,11 +6,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find required libraries
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(GLFW3 pkgconf glfw3)
-find_package(X11 REQUIRED)
+pkg_check_modules(GLFW3 REQUIRED glfw3)
+find_package(Vulkan REQUIRED)
 
 # Add Dear ImGui source files from project directory
-set(IMGUI_DIR "/home/user/Project/gamestat/imgui")
+set(IMGUI_DIR "/home/user/Project/gamestat/imgui" CACHE PATH "Dear ImGui source directory")
 
 # Collect ImGui source files
 file(GLOB IMGUI_SOURCES
@@ -21,10 +21,10 @@ file(GLOB IMGUI_SOURCES
     "${IMGUI_DIR}/imgui_widgets.cpp"
 )
 
-# Collect ImGui backend files (GLFW + OpenGL3)
+# Collect ImGui backend files (GLFW + Vulkan)
 file(GLOB IMGUI_BACKEND_SOURCES
     "${IMGUI_DIR}/backends/imgui_impl_glfw.cpp"
-    "${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp"
+    "${IMGUI_DIR}/backends/imgui_impl_vulkan.cpp"
 )
 
 file(GLOB IMGUI_BACKEND_HEADERS
@@ -33,7 +33,6 @@ file(GLOB IMGUI_BACKEND_HEADERS
     "${IMGUI_DIR}/imconfig.h"
     "${IMGUI_DIR}/backends/imgui_impl_glfw.h"
     "${IMGUI_DIR}/backends/imgui_impl_vulkan.h"
-    "${IMGUI_DIR}/backends/imgui_impl_opengl3.h"
     "${IMGUI_DIR}/imstb_rectpack.h"
     "${IMGUI_DIR}/imstb_texfont.h"
     "${IMGUI_DIR}/imstb_textedit.h"
@@ -59,7 +58,12 @@ add_library(imgui STATIC ${IMGUI_SOURCES} ${IMGUI_BACKEND_SOURCES})
 target_include_directories(imgui PUBLIC
     "${IMGUI_DIR}"
     "${IMGUI_DIR}/backends"
+    ${GLFW3_INCLUDE_DIRS}
 )
+target_link_libraries(imgui PUBLIC Vulkan::Vulkan)
+# Make <GLFW/glfw3.h> pull in <vulkan/vulkan.h> (needed for glfwCreateWindowSurface etc.)
+# and not the OpenGL headers. Propagates to game_stat_overlay through the imgui target.
+target_compile_definitions(imgui PUBLIC GLFW_INCLUDE_NONE GLFW_INCLUDE_VULKAN)
 
 add_executable(game_stat_overlay
     ${APP_SOURCES}
@@ -68,7 +72,8 @@ add_executable(game_stat_overlay
 
 target_link_libraries(game_stat_overlay PRIVATE
     imgui
-    ${GLFW3_LIBRARIES}
+    Vulkan::Vulkan
+    ${GLFW3_LDFLAGS}
     m
 )
 
@@ -78,8 +83,7 @@ target_include_directories(game_stat_overlay PRIVATE
     "${IMGUI_DIR}/backends"
     "/home/user/Project/gamestat/front/nlohmann"
     "/home/user/Project/gamestat/front"
-    ${GLFW3_LIBRARIES}_INCLUDE_DIR
-    ${X11_LIBRARIES}_INCLUDE_DIR
+    ${GLFW3_INCLUDE_DIRS}
 )
 
 # Set target properties for better performance and behavior

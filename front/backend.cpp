@@ -158,10 +158,17 @@ bool BackendCommunicator::launch_backend() {
         dup2(pipe_fds_[1], STDOUT_FILENO);
         close(pipe_fds_[0]);
         close(pipe_fds_[1]);
-        // Set PYTHONUNBUFFERED environment variable
-        char* env[] = {"PYTHONUNBUFFERED=1", nullptr};
-        execl("/usr/bin/python3", "python3", "-u", "/home/user/Project/gamestat/back/main.py", nullptr, env);
-        perror("execl failed");
+        setenv("PYTHONUNBUFFERED", "1", 1);
+
+        char* args[] = {
+            (char*)"/home/user/Project/gamestat/.venv/bin/python",
+            (char*)"-u",
+            (char*)"/home/user/Project/gamestat/back/main.py",
+            nullptr
+        };
+
+        execv(args[0], args);
+        perror("execv failed");
         exit(1);
     }
     close(pipe_fds_[1]);

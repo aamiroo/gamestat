@@ -4,15 +4,11 @@
 #include <imgui.h>
 #include <string>
 
-struct MetricCard {
-    std::string label;
-    std::string value;
-    std::string unit;
-    ImVec2 size;
-    ImVec4 accent_color;
-    bool show_unit;
-};
-
+// MangoHud-style stacked readout:
+//   GPU   37%  61°C  95W
+//   VRAM  25%  2.0/8.0 GB
+//   CPU    1%   --°C
+//   RAM    7%  0.6/7.8 GB
 class MetricsRenderer {
 public:
     MetricsRenderer();
@@ -22,18 +18,20 @@ public:
     void set_window_size(int width, int height);
 
     void update(const TelemetryData& telemetry, double age_seconds);
+
+    // Must be called inside an ImGui window.
     void render();
 
+    // Size of the content drawn by the last render() call (excludes window padding).
+    ImVec2 content_size() const { return content_size_; }
+
 private:
-    MetricCard cpu_card_;
-    MetricCard ram_card_;
-    MetricCard gpu_card_;
+    TelemetryData data_;
+    double age_seconds_ = 0.0;
+    bool has_data_ = false;
+
+    ImVec2 content_size_ = ImVec2(0.0f, 0.0f);
 
     int window_width_;
     int window_height_;
-
-    std::string format_value(float value, const char* unit, bool available) const;
-    void update_cpu_card(const CpuTelemetry& cpu);
-    void update_ram_card(const RamTelemetry& ram);
-    void update_gpu_card(const GpuTelemetry& gpu);
 };

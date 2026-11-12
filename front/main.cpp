@@ -21,7 +21,7 @@ int main() {
 
     // Create and initialize overlay
     Overlay overlay;
-    if (!overlay.init(800, 600, "GameStat Overlay")) {
+    if (!overlay.init(240, 130, "GameStat Overlay")) {
         std::cerr << "Failed to initialize overlay" << std::endl;
         communicator.stop();
         return 1;

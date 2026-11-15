@@ -1,0 +1,22 @@
+{
+  "file_format_version": "1.2.0",
+  "layer": {
+    "name": "VK_LAYER_GAMestat_frame_capture",
+    "type": "GLOBAL",
+    "library_path": "../../../@CMAKE_INSTALL_LIBDIR@/libgamestat_vulkan_layer.so",
+    "api_version": "1.3.0",
+    "implementation_version": "1",
+    "description": "GameStat frame timing capture layer",
+    "functions": {
+      "vkGetInstanceProcAddr": "vkGetInstanceProcAddr",
+      "vkGetDeviceProcAddr": "vkGetDeviceProcAddr",
+      "vkNegotiateLoaderLayerInterfaceVersion": "vkNegotiateLoaderLayerInterfaceVersion"
+    },
+    "enable_environment": {
+      "GAMESTAT_VULKAN_CAPTURE": "1"
+    },
+    "disable_environment": {
+      "DISABLE_GAMESTAT_VULKAN_CAPTURE": "1"
+    }
+  }
+}

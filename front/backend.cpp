@@ -1,3 +1,4 @@
+# Backend communicator - manages pipe-based communication with Python backend
 #include "backend.h"
 
 #include <iostream>
@@ -9,7 +10,7 @@
 
 // Fix: added #include <csignal> above
 
-BackendCommunicator::BackendCommunicator() {
+// Constructor - initializes pipe FDs and sets non-blocking mode
     if (pipe(pipe_fds_) != 0) {
         perror("Failed to create pipe");
     }
@@ -27,7 +28,7 @@ BackendCommunicator::~BackendCommunicator() {
     stop();
 }
 
-bool BackendCommunicator::start() {
+// Start - launches the backend process and starts the read thread
     running_ = true;
     if (!launch_backend()) {
         std::cerr << "Failed to launch backend" << std::endl;

@@ -6,6 +6,8 @@
 namespace {
 
 // MangoHud default palette
+
+// Color constants for metric categories
 const ImVec4 kGpuColor (0x2E / 255.0f, 0x97 / 255.0f, 0x62 / 255.0f, 1.0f);
 const ImVec4 kVramColor(0xAD / 255.0f, 0x64 / 255.0f, 0xC1 / 255.0f, 1.0f);
 const ImVec4 kCpuColor (0x2E / 255.0f, 0x97 / 255.0f, 0xCB / 255.0f, 1.0f);
@@ -15,6 +17,8 @@ const ImVec4 kUnitColor (0.78f, 0.78f, 0.78f, 1.0f);   // units are slightly dim
 const ImVec4 kStaleColor(0.50f, 0.50f, 0.50f, 1.0f);   // backend stopped sending data
 
 // Telemetry older than this is shown dimmed
+
+// Threshold after which metrics are considered stale
 constexpr double kStaleAfterSeconds = 3.0;
 
 // Space between a value and its unit
@@ -22,7 +26,9 @@ constexpr float kUnitGap = 3.0f;
 
 float text_w(const char* s) { return ImGui::CalcTextSize(s).x; }
 
-// Draws "value unit" so that the whole thing ends at x_right (window-content coordinates).
+// Draws "value unit" so the whole thing ends at x_right (window-content coordinates).
+
+// Value is bright, unit dim, like MangoHud.
 // The value is bright, the unit dim, like MangoHud. Always stays on the current line.
 void cell_right(float x_right, const char* value, const char* unit, const ImVec4& value_color,
                 const ImVec4& unit_color) {

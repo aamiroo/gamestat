@@ -1,6 +1,8 @@
 #pragma once
 
 // X11-only window tweaks that let the overlay stay visible above fullscreen games.
+
+// Allows the overlay to remain above fullscreen games using override-redirect window strategy
 //
 // Why this exists: a normal (window-manager-managed) window is placed in a stacking layer
 // by the WM. KWin puts an *active fullscreen* window in a layer above "keep above"

@@ -1,3 +1,4 @@
+# X11 window management - keeps overlay above games using override-redirect strategy
 #include "x11_overlay.h"
 
 #ifdef GAMESTAT_HAVE_X11

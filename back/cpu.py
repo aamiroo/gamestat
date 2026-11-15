@@ -1,8 +1,16 @@
 from pathlib import Path
 import psutil
 
+# CPU metrics module - reads CPU temperature and usage from system files
+
 
 def cpu_temp():
+    """Read CPU temperature from hardware monitoring files.
+    Scans /sys/class/hwmon for coretemp node, reads temperature input,
+    converts from millidegrees to Celsius.
+    Returns:
+        float: CPU temperature in Celsius, or None if not found.
+    """
     hwmon_path = Path("/sys/class/hwmon")
 
     for hwmon in hwmon_path.glob("hwmon*"):
@@ -25,7 +33,14 @@ def cpu_temp():
     return None
 
 
-def cpu_usage ():
+def cpu_usage():
+    """Read current CPU usage percentage.
+
+    Uses psutil to sample CPU percent.
+
+    Returns:
+        float: CPU usage percentage (0-100).
+    """
     return psutil.cpu_percent(interval=1)
 
 if __name__ == "__main__":

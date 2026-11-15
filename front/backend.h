@@ -10,6 +10,8 @@
 #include <csignal>
 #include "nlohmann/json.hpp"
 
+// JSON telemetry data structures and backend communicator
+
 // Forward declaration for telemetry data structures
 struct CpuTelemetry;
 struct RamTelemetry;
@@ -49,6 +51,10 @@ struct GpuTelemetry {
 };
 
 // ----- Overall Telemetry Container -----
+
+// Container holding the latest CPU, RAM, and GPU telemetry data
+
+// Container for CPU, RAM, and GPU telemetry data received from the backend
 struct TelemetryData {
     CpuTelemetry cpu;
     RamTelemetry ram;
@@ -57,7 +63,9 @@ struct TelemetryData {
 };
 
 // ----- Backend Communication Class -----
-class BackendCommunicator {
+
+// Handles communication with the Python backend process via pipe,
+
 public:
     BackendCommunicator();
     ~BackendCommunicator();

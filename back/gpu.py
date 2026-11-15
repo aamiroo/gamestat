@@ -1,6 +1,8 @@
 import pynvml
+# GPU metrics module - reads NVIDIA GPU info via pynvml
 
 def init_gpu ():
+    # Initialize NVML and get GPU handle
     pynvml.nvmlInit()
 
 
@@ -9,12 +11,12 @@ def init_gpu ():
     return handle
 
 
-def gpu_temp (handle):
+def gpu_temp(handle):
     return pynvml.nvmlDeviceGetTemperature(
         handle,
         pynvml.NVML_TEMPERATURE_GPU
     )
-def gpu_usage (handle):
+def gpu_usage(handle):
     utilization = pynvml.nvmlDeviceGetUtilizationRates(handle)
 
     return utilization.gpu

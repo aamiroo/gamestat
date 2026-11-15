@@ -8,6 +8,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GLFW3 REQUIRED glfw3)
 find_package(Vulkan REQUIRED)
+# X11 + XShape: used to make the overlay window override-redirect so it can sit above
+# fullscreen games on X11 (see x11_overlay.h). Optional: without them the overlay still
+# builds and behaves as a normal Always-on-Top window.
+pkg_check_modules(GS_X11 QUIET x11 xext)
 
 # Add Dear ImGui source files from project directory
 set(IMGUI_DIR "/home/user/Project/gamestat/imgui" CACHE PATH "Dear ImGui source directory")
@@ -45,6 +49,7 @@ set(APP_SOURCES
     backend.cpp
     overlay.cpp
     metrics.cpp
+    x11_overlay.cpp
 )
 
 # Application headers
@@ -52,6 +57,7 @@ set(APP_HEADERS
     backend.h
     overlay.h
     metrics.h
+    x11_overlay.h
 )
 
 add_library(imgui STATIC ${IMGUI_SOURCES} ${IMGUI_BACKEND_SOURCES})
@@ -76,6 +82,14 @@ target_link_libraries(game_stat_overlay PRIVATE
     ${GLFW3_LDFLAGS}
     m
 )
+
+if(GS_X11_FOUND)
+    target_compile_definitions(game_stat_overlay PRIVATE GAMESTAT_HAVE_X11)
+    target_include_directories(game_stat_overlay PRIVATE ${GS_X11_INCLUDE_DIRS})
+    target_link_libraries(game_stat_overlay PRIVATE ${GS_X11_LDFLAGS})
+else()
+    message(WARNING "x11/xext not found: overlay cannot rise above fullscreen games on X11")
+endif()
 
 # Include directories
 target_include_directories(game_stat_overlay PRIVATE

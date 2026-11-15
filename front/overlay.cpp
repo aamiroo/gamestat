@@ -2,6 +2,7 @@
 
 #include <backend.h>
 #include <metrics.h>
+#include <x11_overlay.h>
 
 #include <algorithm>
 #include <chrono>
@@ -97,6 +98,7 @@ bool Overlay::init(int width, int height, const char* title) {
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
     glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);                 // shown below, after X11 setup
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);  // used when the platform can composite alpha
     glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_FALSE);
 #ifdef GLFW_MOUSE_PASSTHROUGH
@@ -110,6 +112,11 @@ bool Overlay::init(int width, int height, const char* title) {
         glfwTerminate();
         return false;
     }
+
+    // On X11, take the window away from the window manager (override-redirect) so it is
+    // not subject to KWin's layering, where an active fullscreen window beats Always-on-Top.
+    // Must happen while the window is still hidden. No-op on other platforms.
+    x11_overlay::prepare(window_);
 
     glfwSetWindowPos(window_, 10, 10);  // small margin from the top-left corner, like MangoHud
     glfwShowWindow(window_);
@@ -760,6 +767,7 @@ bool Overlay::run(BackendCommunicator& communicator) {
 
     while (!glfwWindowShouldClose(window_)) {
         glfwPollEvents();
+        x11_overlay::keep_on_top();  // stay above windows (games) mapped after us
 
         // Nothing can be presented to a zero-sized (minimized) window
         int fb_w = 0, fb_h = 0;

@@ -1,0 +1,10 @@
+README.md
+pyproject.toml
+python/gamestat_capture/__init__.py
+python/gamestat_capture/analyzer.py
+python/gamestat_capture/collector.py
+python/gamestat_frame_capture.egg-info/PKG-INFO
+python/gamestat_frame_capture.egg-info/SOURCES.txt
+python/gamestat_frame_capture.egg-info/dependency_links.txt
+python/gamestat_frame_capture.egg-info/top_level.txt
+tests/test_analyzer.py

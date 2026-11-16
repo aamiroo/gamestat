@@ -35,7 +35,7 @@ def sys_info():
                 "clock": gpu.gpu_clock(gpu_handle),
                 "power": gpu.gpu_power(gpu_handle)
             },
-            "fps" :{}
+            "fps" :fps.fps_info()
         
         }
     finally:

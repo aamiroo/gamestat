@@ -7,15 +7,22 @@ name = "back"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "gamestat-frame-capture" },
     { name = "nvidia-ml-py" },
     { name = "psutil" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "gamestat-frame-capture", editable = "../frame-capture" },
     { name = "nvidia-ml-py", specifier = ">=13.615.71" },
     { name = "psutil", specifier = ">=7.2.2" },
 ]
+
+[[package]]
+name = "gamestat-frame-capture"
+version = "0.1.0"
+source = { editable = "../frame-capture" }
 
 [[package]]
 name = "nvidia-ml-py"

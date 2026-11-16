@@ -3,6 +3,10 @@ name = "back"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
+    "gamestat-frame-capture",
     "nvidia-ml-py>=13.615.71",
     "psutil>=7.2.2",
 ]
+
+[tool.uv.sources]
+gamestat-frame-capture = { path = "../frame-capture", editable = true }

@@ -1,6 +1,7 @@
 import cpu
 import ram
 import gpu
+import fps
 import json
 import time
 
@@ -33,7 +34,9 @@ def sys_info():
                 "memory_usage": gpu.gpu_memory_usage(gpu_handle),
                 "clock": gpu.gpu_clock(gpu_handle),
                 "power": gpu.gpu_power(gpu_handle)
-        }
+            },
+            "fps" :{}
+        
         }
     finally:
         gpu.pynvml.nvmlShutdown()

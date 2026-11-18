@@ -9,4 +9,4 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-gamestat-frame-capture = { path = "../frame-capture", editable = true }
+gamestat-frame-capture = { path = "/home/user/Project/gamestat/frame-capture", editable = true }

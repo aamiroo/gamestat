@@ -1,70 +1,80 @@
 # GameStat
 
-<p align="center">
-  <strong>A lightweight hardware monitoring overlay for Linux gaming.</strong>
-  <br />
-  Monitor your CPU, GPU, RAM, and system performance while playing games.
-</p>
+\<p align="center">
+&#x20; \<strong>Linux Gaming Performance Monitor\</strong>
+&#x20; \<br />
+&#x20; Monitor your hardware. Understand your performance.
+\</p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Platform-Linux-blue?style=flat-square" alt="Linux" />
-  <img src="https://img.shields.io/badge/Backend-Python-yellow?style=flat-square" alt="Python" />
-  <img src="https://img.shields.io/badge/Frontend-C%2B%2B-blue?style=flat-square" alt="C++" />
-  <img src="https://img.shields.io/badge/Graphics-Vulkan-red?style=flat-square" alt="Vulkan" />
-  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT License" />
-</p>
+\<p align="center">
+&#x20; \<img src="[https://img.shields.io/badge/Platform-Linux-blue?style=flat-square](https://img.shields.io/badge/Platform-Linux-blue?style=flat-square)" alt="Linux" />
+&#x20; \<img src="[https://img.shields.io/badge/Backend-Python-yellow?style=flat-square](https://img.shields.io/badge/Backend-Python-yellow?style=flat-square)" alt="Python" />
+&#x20; \<img src="[https://img.shields.io/badge/Frontend-C%2B%2B-blue?style=flat-square](https://img.shields.io/badge/Frontend-C%2B%2B-blue?style=flat-square)" alt="C++" />
+&#x20; \<img src="[https://img.shields.io/badge/Rendering-Vulkan-red?style=flat-square](https://img.shields.io/badge/Rendering-Vulkan-red?style=flat-square)" alt="Vulkan" />
+&#x20; \<img src="[https://img.shields.io/badge/License-MIT-green?style=flat-square](https://img.shields.io/badge/License-MIT-green?style=flat-square)" alt="MIT License" />
+\</p>
 
 ---
 
 ## Overview
 
-**GameStat** is a lightweight hardware monitoring application designed to display real-time system statistics through a compact, gaming-oriented overlay.
+**GameStat** is an open-source performance monitoring overlay designed specifically for Linux gaming.
 
-It allows Linux gamers to monitor important hardware metrics without constantly switching away from their games.
+It provides real-time hardware telemetry through a compact, gaming-oriented interface, allowing players to monitor system performance without leaving their games.
 
-The project consists of two main components:
+Built with a modular architecture, GameStat combines a Python-based monitoring backend with a native C++ rendering frontend and a dedicated frame capture module.
 
-- **Python Backend:** Collects hardware telemetry and provides structured monitoring data.
-- **C++ Frontend:** Receives telemetry and renders the overlay using Vulkan and Dear ImGui.
-
-The interface follows a compact, MangoHud-inspired visual style, designed to minimize screen obstruction during gameplay.
+The project focuses on lightweight operation, responsive updates, and extensibility across Linux gaming environments.
 
 ## Features
 
-- Real-time CPU temperature and utilization monitoring.
-- RAM usage, available memory, and total memory monitoring.
-- NVIDIA GPU temperature and utilization monitoring.
-- VRAM usage, available memory, and total memory monitoring.
+### Hardware Monitoring
+
+- Real-time CPU temperature and utilization.
+- RAM usage, available memory, and total memory.
+- NVIDIA GPU temperature and utilization.
+- VRAM usage, available memory, and total memory.
 - GPU memory controller utilization.
 - GPU graphics clock monitoring.
 - GPU power consumption monitoring.
-- Compact MangoHud-inspired overlay interface.
-- Automatic backend startup and communication.
-- Asynchronous telemetry updates.
-- Automatic overlay sizing based on displayed content.
-- Stale-data detection when backend updates stop.
+
+### Overlay
+
+- Compact, gaming-oriented monitoring interface.
 - Vulkan-based rendering.
+- Automatic overlay sizing based on displayed content.
+- Color-coded hardware metrics.
+- Dark interface designed to minimize screen obstruction.
+- Asynchronous telemetry updates.
+- Stale-data detection when backend updates stop.
+
+### System Architecture
+
+- Modular Python and C++ architecture.
+- Automatic backend startup.
+- Asynchronous frontend/backend communication.
+- Dedicated frame capture and analysis components.
 - Designed for low resource consumption.
 
 ## Hardware Metrics
 
-| Component | Metrics |
-|---|---|
-| CPU | Temperature, utilization |
-| RAM | Total, used, available, usage percentage |
-| NVIDIA GPU | Temperature, utilization |
-| VRAM | Total, used, free, usage percentage |
-| GPU | Memory controller utilization, graphics clock, power consumption |
+| Component  | Monitored Metrics                                                |
+| ---------- | ---------------------------------------------------------------- |
+| CPU        | Temperature, utilization                                         |
+| RAM        | Total, used, available, usage percentage                         |
+| NVIDIA GPU | Temperature, utilization                                         |
+| VRAM       | Total, used, free, usage percentage                              |
+| GPU        | Memory controller utilization, graphics clock, power consumption |
 
-> FPS monitoring is not included in the current implementation.
+> FPS capture and monitoring are under development. Full in-game FPS display is not yet considered a stable feature.
 
 ## Architecture
 
-GameStat uses a modular architecture consisting of a Python backend and a C++ frontend.
+GameStat consists of three main components.
 
-### Backend — Python
+### 1. Python Backend
 
-The backend is responsible for collecting hardware telemetry and providing structured monitoring data.
+Responsible for collecting hardware telemetry and providing structured monitoring data.
 
 **Technologies:**
 
@@ -73,9 +83,9 @@ The backend is responsible for collecting hardware telemetry and providing struc
 - NVIDIA Management Library (NVML)
 - nvidia-ml-py
 
-### Frontend — C++
+### 2. C++ Frontend
 
-The frontend is responsible for rendering the monitoring interface and displaying live telemetry.
+Responsible for rendering the overlay and displaying real-time system statistics.
 
 **Technologies:**
 
@@ -85,11 +95,13 @@ The frontend is responsible for rendering the monitoring interface and displayin
 - Dear ImGui
 - CMake
 
-### Communication
+### 3. Frame Capture Module
 
-The C++ frontend launches the Python backend and receives telemetry through the existing process communication mechanism.
+A dedicated component for collecting and analyzing frame-related data.
 
-Incoming JSON data is parsed and processed asynchronously, allowing the interface to update without blocking the rendering loop.
+It includes native capture components and a Python interface for frame collection and analysis.
+
+FPS monitoring is currently under development.
 
 ## Requirements
 
@@ -97,13 +109,14 @@ Incoming JSON data is parsed and processed asynchronously, allowing the interfac
 
 - Linux
 - X11 is the primary target for the current implementation.
-- Desktop compositor and window manager behavior may affect overlay transparency and click-through functionality.
+- Window manager and compositor behavior may affect overlay compatibility.
 
 ### Backend
 
 - Python 3.13+
 - uv
-- NVIDIA GPU and compatible NVIDIA driver for NVIDIA telemetry.
+
+NVIDIA GPU telemetry requires a compatible NVIDIA GPU, driver, and NVML support.
 
 ### Frontend
 
@@ -112,20 +125,29 @@ Incoming JSON data is parsed and processed asynchronously, allowing the interfac
 - pkg-config
 - Vulkan development libraries
 - GLFW 3.4+
-- Dear ImGui source code with GLFW and Vulkan backends.
+- Dear ImGui source code with GLFW and Vulkan backends
 
 The existing `imgui/` directory must contain the Dear ImGui sources and matching Vulkan backend implementation.
 
+### Graphics
+
+- Vulkan-compatible graphics driver
+- Vulkan loader and development libraries
+
 ## Installation
 
-### 1. Clone the repository
+### Build from Source
+
+The following instructions describe the current development installation workflow.
+
+#### 1. Clone the repository
 
 ```bash
 git clone https://github.com/aamiroo/gamestat.git
 cd gamestat
 ```
 
-### 2. Install system dependencies
+#### 2. Install system dependencies
 
 On Debian-based distributions:
 
@@ -147,11 +169,11 @@ Verify Vulkan availability:
 vulkaninfo --summary
 ```
 
-### 3. Install backend dependencies
+#### 3. Install uv
 
-Install [uv](https://docs.astral.sh/uv/) if it is not already installed.
+Install [uv](https://docs.astral.sh/uv/) if it is not already available.
 
-Then install the Python dependencies:
+#### 4. Install backend dependencies
 
 ```bash
 cd back
@@ -159,9 +181,9 @@ uv sync
 cd ..
 ```
 
-The Python environment and dependencies are managed through uv.
+The Python backend and its dependencies are managed through uv.
 
-### 4. Build the frontend
+#### 5. Build the frontend
 
 From the project root:
 
@@ -179,7 +201,7 @@ front/build/game_stat_overlay
 
 ## Running GameStat
 
-Launch GameStat from the project root:
+Launch the application from the project root:
 
 ```bash
 ./front/build/game_stat_overlay
@@ -187,11 +209,11 @@ Launch GameStat from the project root:
 
 The frontend automatically starts the Python backend and receives hardware telemetry.
 
-> Run the application from the project root so the backend can resolve its project-relative paths correctly.
+> The current development version relies on project-relative resources and its configured Python environment. Run it from the project root.
 
 ## NVIDIA GPU Support
 
-NVIDIA GPU metrics are collected through NVML.
+GameStat uses NVIDIA Management Library (NVML) to retrieve GPU telemetry.
 
 Verify that the NVIDIA driver is working:
 
@@ -199,7 +221,7 @@ Verify that the NVIDIA driver is working:
 nvidia-smi
 ```
 
-The backend uses NVIDIA Management Library to retrieve:
+The backend can retrieve:
 
 - GPU temperature
 - GPU utilization
@@ -208,27 +230,19 @@ The backend uses NVIDIA Management Library to retrieve:
 - Graphics clock
 - Power consumption
 
-To inspect available Vulkan devices:
-
-```bash
-vulkaninfo --summary
-```
-
 On hybrid graphics systems, Vulkan device selection and NVIDIA PRIME offloading depend on the installed driver and application configuration.
 
 If NVIDIA telemetry is unavailable, check the driver installation and NVML availability.
 
 ## Overlay
 
-GameStat provides a compact, MangoHud-inspired monitoring interface.
-
-The overlay displays CPU, RAM, GPU, and VRAM statistics in a minimal layout designed for gameplay.
+GameStat provides a compact monitoring interface designed for gaming environments.
 
 Current interface characteristics:
 
-- Compact, automatically sized window.
+- Automatically sized window.
 - Color-coded hardware labels.
-- Minimal spacing and typography.
+- Compact spacing and typography.
 - Dark background.
 - Live metric updates.
 - Stale-data indication when telemetry stops updating.
@@ -239,7 +253,7 @@ Overlay behavior depends on the desktop environment, window manager, compositor,
 
 X11 is the primary target for the current implementation.
 
-**Transparency, click-through behavior, always-on-top behavior, and exclusive fullscreen compatibility depend on the environment and require individual testing.** A genuinely transparent Vulkan window is not guaranteed on X11.
+Transparency, click-through behavior, always-on-top behavior, and exclusive fullscreen compatibility depend on the environment and require individual testing.
 
 ## Development Status
 
@@ -254,8 +268,12 @@ X11 is the primary target for the current implementation.
 | Vulkan rendering | Implemented |
 | Compact monitoring overlay | Implemented |
 | Live metric display | Implemented |
-| FPS monitoring | Planned |
-| Overlay transparency and game compatibility | Requires further testing |
+| Frame capture module | Implemented |
+| FPS monitoring | Implemented |
+| FPS display in overlay | Implemented |
+| In-game overlay display | Tested and working |
+| Extended game compatibility | Requires further testing |
+| Additional hardware support | Planned |
 
 ## Roadmap
 
@@ -267,17 +285,21 @@ X11 is the primary target for the current implementation.
 - [x] Vulkan frontend
 - [x] Compact overlay interface
 - [x] Live metric rendering
-- [ ] FPS monitoring
+- [ ] Complete FPS monitoring
 - [ ] Extended game compatibility testing
 - [ ] Improved transparency and window behavior
-- [ ] Additional hardware support
+- [ ] Additional GPU and hardware support
 - [ ] Configuration and customization
+- [ ] Installation packages for Linux distributions
+- [ ] Expanded documentation
 
 ## Contributing
 
 Contributions, bug reports, and suggestions are welcome.
 
-If you find an issue or have an idea for improvement, feel free to open an issue or submit a pull request.
+Whether you want to report a bug, improve compatibility, contribute code, or suggest a feature, your participation is appreciated.
+
+Feel free to open an issue or submit a pull request.
 
 ## License
 
@@ -287,6 +309,4 @@ See the [LICENSE](LICENSE) file for details.
 
 ---
 
-<p align="center">
-  Made for Linux gaming.
-</p>
+\<p align="center">   Made for Linux gaming. \</p>

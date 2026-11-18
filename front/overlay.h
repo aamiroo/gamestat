@@ -1,4 +1,4 @@
-# Overlay window - Vulkan-based ImGui overlay with X11 stay-on-top support
+// Overlay window - Vulkan-based ImGui overlay with X11 stay-on-top support
 #pragma once
 
 #include <vector>

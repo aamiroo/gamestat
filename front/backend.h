@@ -7,6 +7,7 @@
 #include <condition_variable>
 #include <queue>
 #include <variant>
+#include <optional>
 #include <csignal>
 #include "nlohmann/json.hpp"
 
@@ -16,6 +17,7 @@
 struct CpuTelemetry;
 struct RamTelemetry;
 struct GpuTelemetry;
+struct FpsTelemetry;
 
 // ----- Telemetry Data Structures -----
 
@@ -50,6 +52,19 @@ struct GpuTelemetry {
     bool available = false;
 };
 
+// FPS / frame-time metrics (from the backend's "fps" object).
+// Each metric is std::nullopt when the backend reports it as null or unavailable.
+struct FpsTelemetry {
+    bool available = false;                 // backend "available" flag
+    std::optional<float> fps;               // instantaneous FPS
+    std::optional<float> average_fps;       // average FPS over the analyzer window
+    std::optional<float> frame_time_ms;     // last frame time in ms
+    std::optional<float> p99_frame_time_ms; // 99th percentile frame time in ms
+    std::optional<float> p999_frame_time_ms;// 99.9th percentile frame time in ms
+    std::optional<float> fps_1_low;         // 1% low FPS
+    std::optional<float> fps_01_low;        // 0.1% low FPS
+};
+
 // ----- Overall Telemetry Container -----
 
 // Container holding the latest CPU, RAM, and GPU telemetry data
@@ -59,13 +74,15 @@ struct TelemetryData {
     CpuTelemetry cpu;
     RamTelemetry ram;
     GpuTelemetry gpu;
+    FpsTelemetry fps;
     double last_update{0.0};  // timestamp of last successful update
 };
 
 // ----- Backend Communication Class -----
 
 // Handles communication with the Python backend process via pipe,
-
+// and parses the JSON telemetry it prints.
+class BackendCommunicator {
 public:
     BackendCommunicator();
     ~BackendCommunicator();

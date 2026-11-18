@@ -1,4 +1,4 @@
-# Backend communicator - manages pipe-based communication with Python backend
+// Backend communicator - manages pipe-based communication with Python backend
 #include "backend.h"
 
 #include <iostream>
@@ -11,6 +11,7 @@
 // Fix: added #include <csignal> above
 
 // Constructor - initializes pipe FDs and sets non-blocking mode
+BackendCommunicator::BackendCommunicator() {
     if (pipe(pipe_fds_) != 0) {
         perror("Failed to create pipe");
     }
@@ -29,6 +30,7 @@ BackendCommunicator::~BackendCommunicator() {
 }
 
 // Start - launches the backend process and starts the read thread
+bool BackendCommunicator::start() {
     running_ = true;
     if (!launch_backend()) {
         std::cerr << "Failed to launch backend" << std::endl;
@@ -162,7 +164,7 @@ bool BackendCommunicator::launch_backend() {
         setenv("PYTHONUNBUFFERED", "1", 1);
 
         char* args[] = {
-            (char*)"/home/user/Project/gamestat/.venv/bin/python",
+            (char*)"/home/user/Project/gamestat/back/.venv/bin/python",
             (char*)"-u",
             (char*)"/home/user/Project/gamestat/back/main.py",
             nullptr
@@ -263,6 +265,33 @@ bool BackendCommunicator::parse_telemetry(const std::string& json_str) {
             }
 
             data_.gpu.available = true;
+        }
+
+        // Parse FPS data. Rebuilt on every packet so a null / unavailable metric
+        // never keeps showing a previous value.
+        {
+            FpsTelemetry fps;
+            if (j.contains("fps") && j["fps"].is_object()) {
+                auto& f = j["fps"];
+                fps.available = f.contains("available") && f["available"].is_boolean() &&
+                                f["available"].get<bool>();
+                if (fps.available) {
+                    auto read = [&f](const char* key) -> std::optional<float> {
+                        if (f.contains(key) && f[key].is_number()) {
+                            return static_cast<float>(f[key].get<double>());
+                        }
+                        return std::nullopt;  // null or missing
+                    };
+                    fps.fps                = read("fps");
+                    fps.average_fps        = read("average_fps");
+                    fps.frame_time_ms      = read("frame_time_ms");
+                    fps.p99_frame_time_ms  = read("p99_frame_time_ms");
+                    fps.p999_frame_time_ms = read("p999_frame_time_ms");
+                    fps.fps_1_low          = read("fps_1_low");
+                    fps.fps_01_low         = read("fps_01_low");
+                }
+            }
+            data_.fps = fps;
         }
 
         // Update timestamp

@@ -9,6 +9,7 @@
 //   VRAM  25%  2.0/8.0 GB
 //   CPU    1%   --°C
 //   RAM    7%  0.6/7.8 GB
+//   FPS   60 fps  16.7 ms   (+ AVG, 1%L, 0.1%L rows)
 class MetricsRenderer {
 public:
     MetricsRenderer();

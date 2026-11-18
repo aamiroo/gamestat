@@ -2,6 +2,7 @@
 #include <imgui.h>
 #include <cstdio>
 #include <cmath>
+#include <optional>
 
 namespace {
 
@@ -12,6 +13,7 @@ const ImVec4 kGpuColor (0x2E / 255.0f, 0x97 / 255.0f, 0x62 / 255.0f, 1.0f);
 const ImVec4 kVramColor(0xAD / 255.0f, 0x64 / 255.0f, 0xC1 / 255.0f, 1.0f);
 const ImVec4 kCpuColor (0x2E / 255.0f, 0x97 / 255.0f, 0xCB / 255.0f, 1.0f);
 const ImVec4 kRamColor (0xC2 / 255.0f, 0x66 / 255.0f, 0x93 / 255.0f, 1.0f);
+const ImVec4 kFpsColor (0xE5 / 255.0f, 0xB4 / 255.0f, 0x3C / 255.0f, 1.0f);
 const ImVec4 kValueColor(1.00f, 1.00f, 1.00f, 1.0f);
 const ImVec4 kUnitColor (0.78f, 0.78f, 0.78f, 1.0f);   // units are slightly dimmer than values
 const ImVec4 kStaleColor(0.50f, 0.50f, 0.50f, 1.0f);   // backend stopped sending data
@@ -58,6 +60,12 @@ void fmt_int(char* out, size_t n, bool ok, float v) {
     else    std::snprintf(out, n, "--");
 }
 
+// One decimal for frame times, "--" when the metric is unavailable
+void fmt_ms(char* out, size_t n, bool ok, float v) {
+    if (ok) std::snprintf(out, n, "%.1f", v);
+    else    std::snprintf(out, n, "--");
+}
+
 // "used/total" in GB, e.g. "2.0/8.0"
 void fmt_mem(char* out, size_t n, bool ok, float used, float total) {
     if (!ok) { std::snprintf(out, n, "--"); return; }
@@ -96,6 +104,7 @@ void MetricsRenderer::render() {
     const CpuTelemetry& cpu = data_.cpu;
     const RamTelemetry& ram = data_.ram;
     const GpuTelemetry& gpu = data_.gpu;
+    const FpsTelemetry& fps = data_.fps;
 
     // The backend parser overwrites RamTelemetry::available with a flag, so a populated
     // 'total' is the reliable sign that RAM data arrived.
@@ -106,9 +115,12 @@ void MetricsRenderer::render() {
     // --- Column layout, derived from the widest expected text so it never jiggles ---
     const float em  = ImGui::GetFontSize();
     const float gap = std::floor(em * 0.6f);
-    const float label_w = text_w("VRAM");
-    const float col_a_w = text_w("100") + kUnitGap + text_w("%");     // usage
-    const float col_b_w = text_w("100") + kUnitGap + text_w("°C");    // temperature
+    const float label_w = std::fmax(text_w("VRAM"), text_w("0.1%L"));
+    // Columns also have to fit the FPS rows ("0000 fps", "000.0 ms")
+    const float col_a_w = std::fmax(text_w("100") + kUnitGap + text_w("%"),       // usage
+                                    text_w("0000") + kUnitGap + text_w("fps"));   // fps
+    const float col_b_w = std::fmax(text_w("100") + kUnitGap + text_w("°C"),      // temperature
+                                    text_w("000.0") + kUnitGap + text_w("ms"));   // frame time
     const float col_c_w = text_w("000") + kUnitGap + text_w("W");     // power
     const float mem_w   = text_w("00.0/00.0") + kUnitGap + text_w("GB");
 
@@ -154,6 +166,39 @@ void MetricsRenderer::render() {
     cell_right(x_a, a, ram_ok ? "%" : "", value_color, unit_color);
     fmt_mem(b, sizeof b, ram_ok, ram.used, ram.total);
     cell_right(x_c, b, "GB", value_color, unit_color);
+
+    // subtle separation between the system metrics and the FPS group
+    ImGui::Separator();
+
+    // A metric is shown only when the backend marked FPS available and sent a number
+    const bool fps_ok = fps.available;
+    auto ok = [fps_ok](const std::optional<float>& v) { return fps_ok && v.has_value(); };
+
+    // ----- FPS: current fps + frame time -----
+    label("FPS", kFpsColor);
+    fmt_int(a, sizeof a, ok(fps.fps), fps.fps.value_or(0.0f));
+    cell_right(x_a, a, ok(fps.fps) ? "fps" : "", value_color, unit_color);
+    fmt_ms(b, sizeof b, ok(fps.frame_time_ms), fps.frame_time_ms.value_or(0.0f));
+    cell_right(x_b, b, ok(fps.frame_time_ms) ? "ms" : "", value_color, unit_color);
+
+    // ----- AVG: average fps -----
+    label("AVG", kFpsColor);
+    fmt_int(a, sizeof a, ok(fps.average_fps), fps.average_fps.value_or(0.0f));
+    cell_right(x_a, a, ok(fps.average_fps) ? "fps" : "", value_color, unit_color);
+
+    // ----- 1% low: fps + p99 frame time -----
+    label("1%L", kFpsColor);
+    fmt_int(a, sizeof a, ok(fps.fps_1_low), fps.fps_1_low.value_or(0.0f));
+    cell_right(x_a, a, ok(fps.fps_1_low) ? "fps" : "", value_color, unit_color);
+    fmt_ms(b, sizeof b, ok(fps.p99_frame_time_ms), fps.p99_frame_time_ms.value_or(0.0f));
+    cell_right(x_b, b, ok(fps.p99_frame_time_ms) ? "ms" : "", value_color, unit_color);
+
+    // ----- 0.1% low: fps + p99.9 frame time -----
+    label("0.1%L", kFpsColor);
+    fmt_int(a, sizeof a, ok(fps.fps_01_low), fps.fps_01_low.value_or(0.0f));
+    cell_right(x_a, a, ok(fps.fps_01_low) ? "fps" : "", value_color, unit_color);
+    fmt_ms(b, sizeof b, ok(fps.p999_frame_time_ms), fps.p999_frame_time_ms.value_or(0.0f));
+    cell_right(x_b, b, ok(fps.p999_frame_time_ms) ? "ms" : "", value_color, unit_color);
 
     // Bottom edge of the last row, relative to the window's content origin
     const float bottom = ImGui::GetItemRectMax().y - ImGui::GetWindowPos().y - ImGui::GetStyle().WindowPadding.y;

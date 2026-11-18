@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/Backend-Python-yellow?style=flat-square" alt="Python" />
   <img src="https://img.shields.io/badge/Frontend-C%2B%2B-blue?style=flat-square" alt="C++" />
   <img src="https://img.shields.io/badge/Rendering-Vulkan-red?style=flat-square" alt="Vulkan" />
-  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT License" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="GPL-3.0 License" />
 </p>
 
 ---

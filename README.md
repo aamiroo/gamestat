@@ -1,18 +1,18 @@
 # GameStat
 
-\<p align="center">
-&#x20; \<strong>Linux Gaming Performance Monitor\</strong>
-&#x20; \<br />
-&#x20; Monitor your hardware. Understand your performance.
-\</p>
+<p align="center">
+  <strong>Linux Gaming Performance Monitor</strong>
+  <br />
+  Monitor your hardware. Understand your performance.
+</p>
 
-\<p align="center">
-&#x20; \<img src="[https://img.shields.io/badge/Platform-Linux-blue?style=flat-square](https://img.shields.io/badge/Platform-Linux-blue?style=flat-square)" alt="Linux" />
-&#x20; \<img src="[https://img.shields.io/badge/Backend-Python-yellow?style=flat-square](https://img.shields.io/badge/Backend-Python-yellow?style=flat-square)" alt="Python" />
-&#x20; \<img src="[https://img.shields.io/badge/Frontend-C%2B%2B-blue?style=flat-square](https://img.shields.io/badge/Frontend-C%2B%2B-blue?style=flat-square)" alt="C++" />
-&#x20; \<img src="[https://img.shields.io/badge/Rendering-Vulkan-red?style=flat-square](https://img.shields.io/badge/Rendering-Vulkan-red?style=flat-square)" alt="Vulkan" />
-&#x20; \<img src="[https://img.shields.io/badge/License-MIT-green?style=flat-square](https://img.shields.io/badge/License-MIT-green?style=flat-square)" alt="MIT License" />
-\</p>
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Linux-blue?style=flat-square" alt="Linux" />
+  <img src="https://img.shields.io/badge/Backend-Python-yellow?style=flat-square" alt="Python" />
+  <img src="https://img.shields.io/badge/Frontend-C%2B%2B-blue?style=flat-square" alt="C++" />
+  <img src="https://img.shields.io/badge/Rendering-Vulkan-red?style=flat-square" alt="Vulkan" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT License" />
+</p>
 
 ---
 

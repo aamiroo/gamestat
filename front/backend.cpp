@@ -19,9 +19,6 @@ BackendCommunicator::BackendCommunicator() {
     if (flags >= 0) {
         fcntl(pipe_fds_[0], F_SETFL, flags | O_NONBLOCK);
     }
-    if (flags >= 0) {
-        fcntl(pipe_fds_[1], F_SETFL, flags | O_NONBLOCK);
-    }
     backend_process_ = 0;
 }
 
@@ -41,17 +38,8 @@ bool BackendCommunicator::start() {
     worker_thread_ = std::thread(&BackendCommunicator::read_loop, this);
     worker_thread_.detach();
     std::this_thread::sleep_for(std::chrono::seconds(2));
-    std::cerr << "Checking for new data after 2 seconds..." << std::endl;
     bool data = has_new_data();
     std::cerr << "Has new data: " << data << std::endl;
-    if (!data) {
-        // Dump the raw pipe data for debugging
-        char buffer[4096];
-        lseek(pipe_fds_[0], 0, SEEK_SET);
-        read(pipe_fds_[0], buffer, sizeof(buffer) - 1);
-        buffer[sizeof(buffer) - 1] = '\0';
-        std::cerr << "Pipe data: " << buffer << std::endl;
-    }
     return data;
 }
 
@@ -182,6 +170,8 @@ bool BackendCommunicator::launch_backend() {
 bool BackendCommunicator::parse_telemetry(const std::string& json_str) {
     try {
         auto j = nlohmann::json::parse(json_str);
+
+        std::lock_guard<std::mutex> lock(mutex_);
 
         // Parse CPU data
         if (j.contains("cpu") && j["cpu"].is_object()) {

@@ -14,7 +14,10 @@
 <img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square" alt="GPL-3.0" />
 </p>
 
----
+<p align="center">
+  <img src="image.png" alt="alt text">
+</p>
+
 
 ## Overview
 
@@ -303,10 +306,12 @@ Feel free to open an issue or submit a pull request.
 
 ## License
 
-GameStat is licensed under the **MIT License**.
+GameStat is licensed under the **GPL-3.0 License**.
 
 See the [LICENSE](LICENSE) file for details.
 
 ---
 
-\<p align="center">   Made for Linux gaming. \</p>
+<p align="center">
+  Made for Linux gaming.
+</p>

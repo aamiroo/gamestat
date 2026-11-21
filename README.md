@@ -2,7 +2,7 @@
 
 <p align="center">
   <strong>Linux Gaming Performance Monitor</strong>
-  <br />
+<br />
   Monitor your hardware. Understand your performance.
 </p>
 
@@ -11,13 +11,12 @@
   <img src="https://img.shields.io/badge/Backend-Python-yellow?style=flat-square" alt="Python" />
   <img src="https://img.shields.io/badge/Frontend-C%2B%2B-blue?style=flat-square" alt="C++" />
   <img src="https://img.shields.io/badge/Rendering-Vulkan-red?style=flat-square" alt="Vulkan" />
-<img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square" alt="GPL-3.0" />
+  <img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square" alt="GPL-3.0" />
 </p>
 
 <p align="center">
-  <img src="image.png" alt="alt text">
+ <img src="image.png" alt="GameStat Overlay" />
 </p>
-
 
 ## Overview
 
@@ -41,15 +40,33 @@ The project focuses on lightweight operation, responsive updates, and extensibil
 - GPU graphics clock monitoring.
 - GPU power consumption monitoring.
 
+### FPS Monitoring
+
+- Real-time FPS monitoring.
+- Frame capture and analysis.
+- Average FPS (AVG).
+- 1% Low FPS.
+- 0.1% Low FPS.
+- In-game FPS display.
+
 ### Overlay
 
 - Compact, gaming-oriented monitoring interface.
 - Vulkan-based rendering.
-- Automatic overlay sizing based on displayed content.
+- Automatic window sizing based on displayed content.
+- Fixed window position and dimensions after initialization.
 - Color-coded hardware metrics.
 - Dark interface designed to minimize screen obstruction.
 - Asynchronous telemetry updates.
 - Stale-data detection when backend updates stop.
+- Configuration-based metric visibility.
+
+### Configuration
+
+- Enable or disable individual hardware metrics.
+- Simple configuration file.
+- Default values for missing or invalid settings.
+- Extensible configuration system for future customization.
 
 ### System Architecture
 
@@ -68,8 +85,6 @@ The project focuses on lightweight operation, responsive updates, and extensibil
 | NVIDIA GPU | Temperature, utilization                                         |
 | VRAM       | Total, used, free, usage percentage                              |
 | GPU        | Memory controller utilization, graphics clock, power consumption |
-
-> FPS capture and monitoring are under development. Full in-game FPS display is not yet considered a stable feature.
 
 ## Architecture
 
@@ -104,7 +119,7 @@ A dedicated component for collecting and analyzing frame-related data.
 
 It includes native capture components and a Python interface for frame collection and analysis.
 
-FPS monitoring is currently under development.
+The captured frame data is processed to calculate FPS statistics and provide real-time performance information to the overlay.
 
 ## Requirements
 
@@ -214,6 +229,38 @@ The frontend automatically starts the Python backend and receives hardware telem
 
 > The current development version relies on project-relative resources and its configured Python environment. Run it from the project root.
 
+## Configuration
+
+GameStat provides a simple configuration file for controlling which hardware metrics are displayed in the overlay.
+
+An example configuration is provided as `config-example`.
+
+Copy it to `config` in the same directory:
+
+```bash
+cp config-example config
+```
+
+Open the configuration file and set each metric to `true` or `false`:
+
+```ini
+[display]
+cpu-use=true
+cpu-temp=true
+ram-use=true
+gpu-use=true
+gpu-temp=true
+vram=true
+fps=true
+```
+
+- `true`: Display the metric.
+- `false`: Hide the metric.
+
+Restart GameStat after changing the configuration.
+
+Missing keys and invalid values fall back to their default settings.
+
 ## NVIDIA GPU Support
 
 GameStat uses NVIDIA Management Library (NVML) to retrieve GPU telemetry.
@@ -230,8 +277,6 @@ The backend can retrieve:
 - GPU utilization
 - VRAM statistics
 - Memory controller utilization
-- Graphics clock
-- Power consumption
 
 On hybrid graphics systems, Vulkan device selection and NVIDIA PRIME offloading depend on the installed driver and application configuration.
 
@@ -243,11 +288,13 @@ GameStat provides a compact monitoring interface designed for gaming environment
 
 Current interface characteristics:
 
-- Automatically sized window.
+- Automatically sized window based on displayed content.
+- Fixed window dimensions and position after initialization.
 - Color-coded hardware labels.
 - Compact spacing and typography.
 - Dark background.
 - Live metric updates.
+- Configurable metric visibility.
 - Stale-data indication when telemetry stops updating.
 
 ### Compatibility
@@ -260,23 +307,25 @@ Transparency, click-through behavior, always-on-top behavior, and exclusive full
 
 ## Development Status
 
-| Component | Status |
-|---|---|
-| CPU monitoring | Implemented |
-| RAM monitoring | Implemented |
-| NVIDIA GPU monitoring | Implemented |
-| VRAM monitoring | Implemented |
-| Backend integration | Implemented |
-| C++ frontend | Implemented |
-| Vulkan rendering | Implemented |
-| Compact monitoring overlay | Implemented |
-| Live metric display | Implemented |
-| Frame capture module | Implemented |
-| FPS monitoring | Implemented |
-| FPS display in overlay | Implemented |
-| In-game overlay display | Tested and working |
-| Extended game compatibility | Requires further testing |
-| Additional hardware support | Planned |
+| Component                       | Status                   |
+| ------------------------------- | ------------------------ |
+| CPU monitoring                  | Implemented              |
+| RAM monitoring                  | Implemented              |
+| NVIDIA GPU monitoring           | Implemented              |
+| VRAM monitoring                 | Implemented              |
+| Backend integration             | Implemented              |
+| C++ frontend                    | Implemented              |
+| Vulkan rendering                | Implemented              |
+| Compact monitoring overlay      | Implemented              |
+| Live metric display             | Implemented              |
+| Frame capture module            | Implemented              |
+| FPS monitoring                  | Implemented              |
+| FPS display in overlay          | Implemented              |
+| In-game overlay display         | Tested and working       |
+| Configuration management        | Implemented              |
+| Metric visibility configuration | Implemented              |
+| Extended game compatibility     | Requires further testing |
+| Additional hardware support     | Planned                  |
 
 ## Roadmap
 
@@ -288,11 +337,15 @@ Transparency, click-through behavior, always-on-top behavior, and exclusive full
 - [x] Vulkan frontend
 - [x] Compact overlay interface
 - [x] Live metric rendering
-- [ ] Complete FPS monitoring
+- [x] FPS monitoring
+- [x] FPS display in overlay
+- [x] In-game overlay testing
+- [x] Configuration management
+- [x] Configurable metric visibility
+- [ ] Advanced overlay customization
+- [ ] Configurable window dimensions and positioning
 - [ ] Extended game compatibility testing
-- [ ] Improved transparency and window behavior
 - [ ] Additional GPU and hardware support
-- [ ] Configuration and customization
 - [ ] Installation packages for Linux distributions
 - [ ] Expanded documentation
 

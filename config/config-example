@@ -1,0 +1,29 @@
+# GameStat overlay - example config
+#
+# Copy this file to "config" (same folder) and edit it:
+#     cp config-example config
+#
+# Restart the overlay after changing it.
+#
+# Values: true / false  (also accepted: yes / no, on / off, 1 / 0)
+# A missing key or an invalid value (e.g. a typo like "fals") falls back to true.
+# Comments must be on their own line; do not put "# ..." after a value.
+
+[display]
+
+# CPU row
+cpu-use=true
+cpu-temp=true
+
+# RAM row
+ram-use=true
+
+# GPU row (usage, temperature)
+gpu-use=true
+gpu-temp=true
+
+# VRAM row
+vram=true
+
+# FPS block (FPS, AVG, 1%L, 0.1%L)
+fps=true

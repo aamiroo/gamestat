@@ -9,18 +9,11 @@ import time
 # Gathers CPU, RAM, and GPU metrics from the system and returns them as a JSON object.
 
 
-def sys_info():
+def sys_info(gpu_handle):
     
-    """Collects CPU, RAM, and GPU metrics.
-    Initializes GPU handle, then gathers temperature and usage data.
-    Returns:
-        dict: System metrics organized by component (cpu, ram, gpu).
-    """
+    """Collects CPU, RAM, GPU, and FPS metrics using an initialized GPU handle."""
 
-    gpu_handle = gpu.init_gpu()
-
-    try:
-        return{
+    return{
 
             "cpu": {
                 "temp": cpu.cpu_temp(),
@@ -38,14 +31,19 @@ def sys_info():
             "fps" :fps.fps_info()
         
         }
-    finally:
-        gpu.pynvml.nvmlShutdown()
+    
 
 if __name__ == "__main__":
-    while True:
 
-        info = sys_info()
+    gpu_handle= gpu.init_gpu()
+    
+    try:
+        while True:
 
-        print(json.dumps(info, indent=4))
-        # Wait 1 second before next reading
-        time.sleep(1)
+            info = sys_info(gpu_handle)
+
+            print(json.dumps(info, indent=4))
+            # Wait 1 second before next reading
+            time.sleep(1)
+    finally:
+        gpu.pynvml.nvmlShutdown()

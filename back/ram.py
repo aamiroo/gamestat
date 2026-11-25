@@ -18,6 +18,7 @@ def ram_info ():
         }
     except (OSError , ValueError , RuntimeError) as error:
         print (f"[RAM INFORMATION ERROR] {error}")
+        return None
 
 if __name__ == "__main__":
     ram = ram_info()

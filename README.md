@@ -54,7 +54,8 @@ The project focuses on lightweight operation, responsive updates, and extensibil
 - Compact, gaming-oriented monitoring interface.
 - Vulkan-based rendering.
 - Automatic window sizing based on displayed content.
-- Fixed window position and dimensions after initialization.
+- Movable overlay with adjustable window position.
+- Fixed window dimensions after initialization.
 - Color-coded hardware metrics.
 - Dark interface designed to minimize screen obstruction.
 - Asynchronous telemetry updates.
@@ -289,7 +290,8 @@ GameStat provides a compact monitoring interface designed for gaming environment
 Current interface characteristics:
 
 - Automatically sized window based on displayed content.
-- Fixed window dimensions and position after initialization.
+- Movable overlay with adjustable window position.
+- Fixed window dimensions after initialization.
 - Color-coded hardware labels.
 - Compact spacing and typography.
 - Dark background.
@@ -318,6 +320,7 @@ Transparency, click-through behavior, always-on-top behavior, and exclusive full
 | Vulkan rendering                | Implemented              |
 | Compact monitoring overlay      | Implemented              |
 | Live metric display             | Implemented              |
+| Movable overlay                 | Implemented              |
 | Frame capture module            | Implemented              |
 | FPS monitoring                  | Implemented              |
 | FPS display in overlay          | Implemented              |
@@ -342,8 +345,9 @@ Transparency, click-through behavior, always-on-top behavior, and exclusive full
 - [x] In-game overlay testing
 - [x] Configuration management
 - [x] Configurable metric visibility
-- [ ] Advanced overlay customization
-- [ ] Configurable window dimensions and positioning
+- [x] Movable overlay
+- [x] Advanced overlay customization
+- [ ] Configurable window dimensions
 - [ ] Extended game compatibility testing
 - [ ] Additional GPU and hardware support
 - [ ] Installation packages for Linux distributions

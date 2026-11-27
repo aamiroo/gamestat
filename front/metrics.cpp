@@ -138,6 +138,14 @@ DisplayConfig load_display_config() {
         if (sep == std::string::npos) continue;
         const std::string key = lower(trim(t.substr(0, sep)));
         const std::string val = trim(t.substr(sep + 1));
+        if (key == "position") {   // not a boolean: one of the four corners, else keep the default
+            const std::string v = lower(val);
+            if      (v == "top-left")     cfg.position = OverlayPosition::TopLeft;
+            else if (v == "top-right")    cfg.position = OverlayPosition::TopRight;
+            else if (v == "bottom-right") cfg.position = OverlayPosition::BottomRight;
+            else if (v == "bottom-left")  cfg.position = OverlayPosition::BottomLeft;
+            continue;
+        }
         for (const Entry& e : entries) {
             bool b = false;
             if (key == e.key && parse_bool(val, b)) *e.field = b;

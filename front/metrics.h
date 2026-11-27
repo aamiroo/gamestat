@@ -4,6 +4,9 @@
 #include <imgui.h>
 #include <string>
 
+// Screen corner the overlay is anchored to.
+enum class OverlayPosition { TopLeft, TopRight, BottomRight, BottomLeft };
+
 // Which metrics are shown. Loaded from the user's config file ([display] section);
 // everything is on by default.
 struct DisplayConfig {
@@ -14,6 +17,7 @@ struct DisplayConfig {
     bool gpu_use  = true;
     bool vram     = true;
     bool fps      = true;
+    OverlayPosition position = OverlayPosition::TopLeft;
 };
 
 // MangoHud-style stacked readout:
@@ -34,6 +38,9 @@ public:
 
     // Must be called inside an ImGui window.
     void render();
+
+    // Corner of the screen the overlay should be placed in (from the config).
+    OverlayPosition position() const { return display_.position; }
 
     // Size of the content drawn by the last render() call (excludes window padding).
     ImVec2 content_size() const { return content_size_; }

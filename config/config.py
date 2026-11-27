@@ -3,13 +3,16 @@ from pathlib import Path
 
 DEFAULTS= {
     "cpu-temp" : True,
-    "cpu-use": True,
+    "cpu-use" : True,
     "ram-use" : True,
     "gpu-temp" : True,
     "gpu-use" : True,
     "vram" : True,
     "fps" : True,
 }
+
+POSITION = ("top-left" , "top-right" , "down-left" , "down-right")
+DEFAULTS_POSITION = "top-left"
 
 CONFIG_PATH = Path(__file__).parent / "config"
 
@@ -37,4 +40,7 @@ def load_config ():
             )
         except ValueError:
             result[key] = default
+
+    position = config.get("display" , "position" , fallback=DEFAULTS_POSITION).strip().lower()
+    result["position"] = position if position in POSITION else DEFAULTS_POSITION
     return result

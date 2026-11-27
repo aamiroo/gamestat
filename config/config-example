@@ -18,7 +18,7 @@ cpu-temp=true
 # RAM row
 ram-use=true
 
-# GPU row (usage, temperature)
+# GPU row
 gpu-use=true
 gpu-temp=true
 
@@ -27,3 +27,7 @@ vram=true
 
 # FPS block (FPS, AVG, 1%L, 0.1%L)
 fps=true
+
+# Screen corner for the overlay: top-left, top-right, bottom-right or bottom-left
+# (anything else falls back to top-left)
+position=top-left

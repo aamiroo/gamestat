@@ -1,22 +1,27 @@
 import configparser
+import json
 from pathlib import Path
 
-DEFAULTS= {
-    "cpu-temp" : True,
-    "cpu-use" : True,
-    "ram-use" : True,
-    "gpu-temp" : True,
-    "gpu-use" : True,
-    "vram" : True,
-    "fps" : True,
+DEFAULTS = {
+    "cpu-temp": True,
+    "cpu-use": True,
+    "ram-use": True,
+    "gpu-temp": True,
+    "gpu-use": True,
+    "gpu-power": True,
+    "gpu-clock": True,
+    "gpu-mem-ctrl": True,
+    "vram": True,
+    "fps": True,
 }
 
-POSITION = ("top-left" , "top-right" , "down-left" , "down-right")
-DEFAULTS_POSITION = "top-left"
+POSITIONS = ("top-left", "top-right", "bottom-right", "bottom-left")
+DEFAULT_POSITION = "top-left"
 
 CONFIG_PATH = Path(__file__).parent / "config"
 
-def load_config ():
+
+def load_config():
     config = configparser.ConfigParser()
 
     config.read_dict({
@@ -28,19 +33,17 @@ def load_config ():
     try:
         if CONFIG_PATH.exists():
             config.read(CONFIG_PATH)
-    except (OSError , configparser.Error):
+    except (OSError, configparser.Error):
         pass
 
     result = {}
 
     for key, default in DEFAULTS.items():
         try:
-            result[key] = config.getboolean(
-                "display" , key , fallback=default
-            )
+            result[key] = config.getboolean("display", key, fallback=default)
         except ValueError:
             result[key] = default
 
-    position = config.get("display" , "position" , fallback=DEFAULTS_POSITION).strip().lower()
-    result["position"] = position if position in POSITION else DEFAULTS_POSITION
+    position = config.get("display", "position", fallback=DEFAULT_POSITION).strip().lower()
+    result["position"] = position if position in POSITIONS else DEFAULT_POSITION
     return result

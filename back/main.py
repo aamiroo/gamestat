@@ -5,8 +5,15 @@ import fps
 import json
 import time
 
+import sys
+from pathlib import Path
+
 # System information collector module
 # Gathers CPU, RAM, and GPU metrics from the system and returns them as a JSON object.
+
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "config"))
+import config as display_config
 
 
 def sys_info(gpu_handle):
@@ -28,7 +35,8 @@ def sys_info(gpu_handle):
                 "clock": gpu.gpu_clock(gpu_handle),
                 "power": gpu.gpu_power(gpu_handle)
             },
-            "fps" :fps.fps_info()
+            "fps" :fps.fps_info(),
+            "config" : display_config.load_config(),
         
         }
     

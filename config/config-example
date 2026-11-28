@@ -18,9 +18,16 @@ cpu-temp=true
 # RAM row
 ram-use=true
 
-# GPU row
+# GPU row (usage, temperature, power)
 gpu-use=true
 gpu-temp=true
+gpu-power=true
+
+# GPU graphics clock row (MHz)
+gpu-clock=true
+
+# GPU memory controller utilization row (%)
+gpu-mem-ctrl=true
 
 # VRAM row
 vram=true

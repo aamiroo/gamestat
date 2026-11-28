@@ -3,9 +3,6 @@
 #include <cstdio>
 #include <cctype>
 #include <cmath>
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
 #include <optional>
 #include <string>
 
@@ -78,83 +75,6 @@ void fmt_mem(char* out, size_t n, bool ok, float used, float total) {
     else                 std::snprintf(out, n, "%.1f/%.1f", used, total);
 }
 
-// ----- Display config -----
-// Reads the user's config file (INI, [display] section, same file the Python config
-// loader reads). Defaults are "show everything"; a key only changes when the file sets
-// it to a valid boolean, exactly like Python's configparser.getboolean fallback.
-
-std::string trim(const std::string& s) {
-    const char* ws = " \t\r\n";
-    const size_t b = s.find_first_not_of(ws);
-    if (b == std::string::npos) return "";
-    return s.substr(b, s.find_last_not_of(ws) - b + 1);
-}
-
-std::string lower(std::string s) {
-    for (char& ch : s) ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
-    return s;
-}
-
-// Accepts the same words as configparser: 1/yes/true/on and 0/no/false/off
-bool parse_bool(const std::string& value, bool& out) {
-    const std::string v = lower(value);
-    if (v == "1" || v == "yes" || v == "true"  || v == "on")  { out = true;  return true; }
-    if (v == "0" || v == "no"  || v == "false" || v == "off") { out = false; return true; }
-    return false;
-}
-
-// GAMESTAT_CONFIG overrides the location; default is <project>/config/config.
-std::string config_path() {
-    const char* env = std::getenv("GAMESTAT_CONFIG");
-    if (env && *env) return env;
-    const char* home = std::getenv("HOME");
-    return std::string(home ? home : "") + "/Project/gamestat/config/config";
-}
-
-DisplayConfig load_display_config() {
-    DisplayConfig cfg;
-    const std::string path = config_path();
-    std::ifstream in(path);
-    if (!in) {
-        std::cerr << "Config: " << path << " not found, showing all metrics" << std::endl;
-        return cfg;
-    }
-
-    struct Entry { const char* key; bool* field; };
-    const Entry entries[] = {
-        {"cpu-temp", &cfg.cpu_temp}, {"cpu-use", &cfg.cpu_use}, {"ram-use", &cfg.ram_use},
-        {"gpu-temp", &cfg.gpu_temp}, {"gpu-use", &cfg.gpu_use}, {"vram", &cfg.vram},
-        {"fps", &cfg.fps},
-    };
-
-    std::string section, line;
-    while (std::getline(in, line)) {
-        const std::string t = trim(line);
-        if (t.empty() || t[0] == '#' || t[0] == ';') continue;
-        if (t.front() == '[' && t.back() == ']') { section = trim(t.substr(1, t.size() - 2)); continue; }
-        if (section != "display") continue;
-
-        const size_t sep = t.find_first_of("=:");
-        if (sep == std::string::npos) continue;
-        const std::string key = lower(trim(t.substr(0, sep)));
-        const std::string val = trim(t.substr(sep + 1));
-        if (key == "position") {   // not a boolean: one of the four corners, else keep the default
-            const std::string v = lower(val);
-            if      (v == "top-left")     cfg.position = OverlayPosition::TopLeft;
-            else if (v == "top-right")    cfg.position = OverlayPosition::TopRight;
-            else if (v == "bottom-right") cfg.position = OverlayPosition::BottomRight;
-            else if (v == "bottom-left")  cfg.position = OverlayPosition::BottomLeft;
-            continue;
-        }
-        for (const Entry& e : entries) {
-            bool b = false;
-            if (key == e.key && parse_bool(val, b)) *e.field = b;
-        }
-    }
-    std::cerr << "Config: loaded " << path << std::endl;
-    return cfg;
-}
-
 }  // namespace
 
 MetricsRenderer::MetricsRenderer()
@@ -165,7 +85,6 @@ MetricsRenderer::~MetricsRenderer() {
 }
 
 void MetricsRenderer::init() {
-    display_ = load_display_config();
 }
 
 void MetricsRenderer::set_window_size(int width, int height) {
@@ -175,6 +94,7 @@ void MetricsRenderer::set_window_size(int width, int height) {
 
 void MetricsRenderer::update(const TelemetryData& telemetry, double age_seconds) {
     data_ = telemetry;
+    display_ = telemetry.config;
     age_seconds_ = age_seconds;
     has_data_ = telemetry.last_update > 0.0;
 }
@@ -200,8 +120,9 @@ void MetricsRenderer::render() {
     const float gap = std::floor(em * 0.6f);
     const float label_w = std::fmax(text_w("VRAM"), text_w("0.1%L"));
     // Columns also have to fit the FPS rows ("0000 fps", "000.0 ms")
-    const float col_a_w = std::fmax(text_w("100") + kUnitGap + text_w("%"),       // usage
-                                    text_w("0000") + kUnitGap + text_w("fps"));   // fps
+    const float col_a_w = std::fmax(std::fmax(text_w("100") + kUnitGap + text_w("%"),       // usage
+                                              text_w("0000") + kUnitGap + text_w("fps")),   // fps
+                                    text_w("0000") + kUnitGap + text_w("MHz"));             // gpu clock
     const float col_b_w = std::fmax(text_w("100") + kUnitGap + text_w("°C"),      // temperature
                                     text_w("000.0") + kUnitGap + text_w("ms"));   // frame time
     const float col_c_w = text_w("000") + kUnitGap + text_w("W");     // power
@@ -216,7 +137,7 @@ void MetricsRenderer::render() {
     // cells is enabled. Cells keep their fixed column positions, so hiding one never shifts
     // the others.
     const DisplayConfig& cfg = display_;
-    const bool show_gpu  = cfg.gpu_use || cfg.gpu_temp;   // GPU power follows the GPU row
+    const bool show_gpu  = cfg.gpu_use || cfg.gpu_temp || cfg.gpu_power;
     const bool show_vram = cfg.vram;
     const bool show_cpu  = cfg.cpu_use || cfg.cpu_temp;
     const bool show_ram  = cfg.ram_use;
@@ -238,7 +159,7 @@ void MetricsRenderer::render() {
     char a[32], b[32], c[32];
 
     // ----- GPU + VRAM -----
-    begin_group(show_gpu || show_vram);
+    begin_group(show_gpu || show_vram || cfg.gpu_clock || cfg.gpu_mem_ctrl);
     if (show_gpu) {
         label("GPU", kGpuColor);
         if (cfg.gpu_use) {
@@ -249,8 +170,10 @@ void MetricsRenderer::render() {
             fmt_int(b, sizeof b, gpu_ok && gpu.temperature > 0.0f, gpu.temperature);
             cell(x_b, b, "°C");
         }
-        fmt_int(c, sizeof c, gpu_ok && gpu.power > 0.0f, gpu.power);
-        cell(x_c, c, "W");
+        if (cfg.gpu_power) {
+            fmt_int(c, sizeof c, gpu_ok && gpu.power > 0.0f, gpu.power);
+            cell(x_c, c, "W");
+        }
     }
     if (show_vram) {
         const bool vram_ok = gpu_ok && gpu.vram_total > 0.0f;
@@ -259,6 +182,17 @@ void MetricsRenderer::render() {
         cell(x_a, a, vram_ok ? "%" : "");
         fmt_mem(b, sizeof b, vram_ok, gpu.vram_used, gpu.vram_total);
         cell(x_c, b, "GB");
+    }
+    if (cfg.gpu_clock) {
+        const bool clock_ok = gpu_ok && gpu.graphics_clock > 0.0f;
+        label("CLK", kGpuColor);
+        fmt_int(a, sizeof a, clock_ok, gpu.graphics_clock);
+        cell(x_a, a, clock_ok ? "MHz" : "");
+    }
+    if (cfg.gpu_mem_ctrl) {
+        label("MCU", kVramColor);   // GPU memory controller utilization
+        fmt_int(a, sizeof a, gpu_ok, gpu.memory_controller);
+        cell(x_a, a, gpu_ok ? "%" : "");
     }
 
     // ----- CPU + RAM -----

@@ -4,22 +4,6 @@
 #include <imgui.h>
 #include <string>
 
-// Screen corner the overlay is anchored to.
-enum class OverlayPosition { TopLeft, TopRight, BottomRight, BottomLeft };
-
-// Which metrics are shown. Loaded from the user's config file ([display] section);
-// everything is on by default.
-struct DisplayConfig {
-    bool cpu_temp = true;
-    bool cpu_use  = true;
-    bool ram_use  = true;
-    bool gpu_temp = true;
-    bool gpu_use  = true;
-    bool vram     = true;
-    bool fps      = true;
-    OverlayPosition position = OverlayPosition::TopLeft;
-};
-
 // MangoHud-style stacked readout:
 //   GPU   37%  61°C  95W
 //   VRAM  25%  2.0/8.0 GB

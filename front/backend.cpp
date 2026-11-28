@@ -19,6 +19,9 @@ BackendCommunicator::BackendCommunicator() {
     if (flags >= 0) {
         fcntl(pipe_fds_[0], F_SETFL, flags | O_NONBLOCK);
     }
+    if (flags >= 0) {
+        fcntl(pipe_fds_[1], F_SETFL, flags | O_NONBLOCK);
+    }
     backend_process_ = 0;
 }
 
@@ -38,8 +41,17 @@ bool BackendCommunicator::start() {
     worker_thread_ = std::thread(&BackendCommunicator::read_loop, this);
     worker_thread_.detach();
     std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::cerr << "Checking for new data after 2 seconds..." << std::endl;
     bool data = has_new_data();
     std::cerr << "Has new data: " << data << std::endl;
+    if (!data) {
+        // Dump the raw pipe data for debugging
+        char buffer[4096];
+        lseek(pipe_fds_[0], 0, SEEK_SET);
+        read(pipe_fds_[0], buffer, sizeof(buffer) - 1);
+        buffer[sizeof(buffer) - 1] = '\0';
+        std::cerr << "Pipe data: " << buffer << std::endl;
+    }
     return data;
 }
 
@@ -152,7 +164,7 @@ bool BackendCommunicator::launch_backend() {
         setenv("PYTHONUNBUFFERED", "1", 1);
 
         char* args[] = {
-            (char*)"/home/user/Project/gamestat/back/.venv/bin/python",
+            (char*)"/home/user/Project/gamestat/.venv/bin/python",
             (char*)"-u",
             (char*)"/home/user/Project/gamestat/back/main.py",
             nullptr
@@ -170,8 +182,6 @@ bool BackendCommunicator::launch_backend() {
 bool BackendCommunicator::parse_telemetry(const std::string& json_str) {
     try {
         auto j = nlohmann::json::parse(json_str);
-
-        std::lock_guard<std::mutex> lock(mutex_);
 
         // Parse CPU data
         if (j.contains("cpu") && j["cpu"].is_object()) {
@@ -282,6 +292,34 @@ bool BackendCommunicator::parse_telemetry(const std::string& json_str) {
                 }
             }
             data_.fps = fps;
+        }
+
+        // Parse display config (built by config.py in the backend). Rebuilt on every packet,
+        // so edits to the config file apply live; a missing object means "show everything".
+        {
+            DisplayConfig cfg;
+            if (j.contains("config") && j["config"].is_object()) {
+                auto& c = j["config"];
+                struct Entry { const char* key; bool* field; };
+                const Entry entries[] = {
+                    {"cpu-temp", &cfg.cpu_temp}, {"cpu-use", &cfg.cpu_use}, {"ram-use", &cfg.ram_use},
+                    {"gpu-temp", &cfg.gpu_temp}, {"gpu-use", &cfg.gpu_use}, {"vram", &cfg.vram},
+                    {"fps", &cfg.fps},
+                    {"gpu-power", &cfg.gpu_power}, {"gpu-clock", &cfg.gpu_clock},
+                    {"gpu-mem-ctrl", &cfg.gpu_mem_ctrl},
+                };
+                for (const Entry& e : entries) {
+                    if (c.contains(e.key) && c[e.key].is_boolean()) *e.field = c[e.key].get<bool>();
+                }
+                if (c.contains("position") && c["position"].is_string()) {
+                    const std::string v = c["position"].get<std::string>();
+                    if      (v == "top-left")     cfg.position = OverlayPosition::TopLeft;
+                    else if (v == "top-right")    cfg.position = OverlayPosition::TopRight;
+                    else if (v == "bottom-right") cfg.position = OverlayPosition::BottomRight;
+                    else if (v == "bottom-left")  cfg.position = OverlayPosition::BottomLeft;
+                }
+            }
+            data_.config = cfg;
         }
 
         // Update timestamp

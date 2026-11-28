@@ -792,6 +792,7 @@ bool Overlay::run(BackendCommunicator& communicator) {
     int frame_count = 0;
     double overlay_fps = 0.0;
     bool placed = false;   // window moved to its configured corner at least once
+    OverlayPosition placed_position = OverlayPosition::TopLeft;   // corner it was last placed in
 
     while (!glfwWindowShouldClose(window_)) {
         glfwPollEvents();
@@ -848,10 +849,13 @@ bool Overlay::run(BackendCommunicator& communicator) {
         const int want_h = static_cast<int>(std::ceil(metrics_.content_size().y + pad.y * 2.0f));
         int cur_w = 0, cur_h = 0;
         glfwGetWindowSize(window_, &cur_w, &cur_h);
-        if (want_w > 0 && want_h > 0 && (!placed || cur_w != want_w || cur_h != want_h)) {
+        const OverlayPosition want_pos = metrics_.position();
+        if (want_w > 0 && want_h > 0 &&
+            (!placed || cur_w != want_w || cur_h != want_h || want_pos != placed_position)) {
             glfwSetWindowSize(window_, want_w, want_h);
-            place_window(window_, metrics_.position(), want_w, want_h);
+            place_window(window_, want_pos, want_w, want_h);
             placed = true;
+            placed_position = want_pos;
         }
 
         // Render ImGui drawing commands, then submit and present the frame

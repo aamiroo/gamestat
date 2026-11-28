@@ -65,6 +65,25 @@ struct FpsTelemetry {
     std::optional<float> fps_01_low;        // 0.1% low FPS
 };
 
+// Screen corner the overlay is anchored to.
+enum class OverlayPosition { TopLeft, TopRight, BottomRight, BottomLeft };
+
+// Which metrics are shown and where. Sent by the backend (config.py);
+// everything is on by default.
+struct DisplayConfig {
+    bool cpu_temp = true;
+    bool cpu_use  = true;
+    bool ram_use  = true;
+    bool gpu_temp = true;
+    bool gpu_use  = true;
+    bool vram     = true;
+    bool gpu_power    = true;
+    bool gpu_clock    = true;
+    bool gpu_mem_ctrl = true;
+    bool fps      = true;
+    OverlayPosition position = OverlayPosition::TopLeft;
+};
+
 // ----- Overall Telemetry Container -----
 
 // Container holding the latest CPU, RAM, and GPU telemetry data
@@ -75,6 +94,7 @@ struct TelemetryData {
     RamTelemetry ram;
     GpuTelemetry gpu;
     FpsTelemetry fps;
+    DisplayConfig config;   // what to show / where (from the backend's "config" object)
     double last_update{0.0};  // timestamp of last successful update
 };
 
